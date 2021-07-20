@@ -288,3 +288,285 @@ class Req {
 }
 
 let req: Req = new Req("bi");
+
+/**
+ * 类与接口
+ * 接口（Interfaces）可以用于对「对象的形状（Shape）」进行描述
+ **/
+
+// 类实现接口 implements (实现)
+
+// 举例来说，门是一个类，防盗门是门的子类。
+// 如果防盗门有一个报警器的功能，我们可以简单的给防盗门添加一个报警方法。
+// 这时候如果有另一个类，车，也有报警器的功能，就可以考虑把报警器提取出来，
+// 作为一个接口，防盗门和车都去实现它：
+
+interface Alarm {
+  alert(): void;
+}
+
+interface Lock {
+  lock: boolean;
+}
+
+class Door {}
+
+// 类实现接口
+class SecurityDoor extends Door implements Alarm, Lock {
+  lock: boolean = false;
+  // 必须实现alert方法
+  alert() {}
+}
+
+class Cars implements Alarm {
+  alert() {}
+}
+
+// 类可以实现多个接口
+
+class Bag implements Lock, Alarm {
+  lock: boolean;
+  constructor() {
+    this.lock = false;
+  }
+  alert() {
+    console.log("类实现多个接口");
+  }
+}
+
+// 接口继承
+
+interface Parent {
+  say(): void;
+}
+
+interface Child extends Parent {
+  name: string;
+}
+
+// Type '{}' is missing the following properties from type 'Child': name, say ts(2739)
+let xw: Child = {
+  name: "小王",
+  say: () => {
+    console.log(`my name is ${xw.name}`);
+  }
+};
+
+// 接口继承类
+
+// 声明 Point 类时创建的 Point 类型只包含其中的实例属性和实例方法：
+class Point {
+  x: string;
+  y: string;
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+interface Point3D extends Point {
+  z: string;
+}
+
+// Type '{}' is missing the following properties from type 'Point3D': z, x, y
+let ps: Point3D = {
+  x: "0",
+  y: "0",
+  z: "0"
+};
+
+// 为什么 TypeScript 会支持接口继承类呢？
+// 实际上，当我们在声明 class Point 时，除了会创建一个名为 Point 的类之外，
+// 同时也创建了一个名为 Point 的类型（实例的类型）
+// 所以我们既可以把Point当类来使用 也可以把Point当作接口来使用
+
+/**
+ * 泛型 Generics
+ * 是指在定义函数、接口和类的时候, 不预先指定具体的类型,而是在使用的时候在指定的特性
+ */
+
+function creatArray(length: number, value: any): Array<any> {
+  let res = [];
+  for (let i = 0; i < length; i++) {
+    res[i] = value;
+  }
+  return res;
+}
+
+creatArray(3, "six");
+
+// 上例中，我们使用了之前提到过的数组泛型来定义返回值的类型。
+// 这段代码编译不会报错 但是一个显而易见的错误, 没有准确的定义返回的类型
+// 这个时候泛型就可以了
+
+function creatArr<U>(length: number, value: U): Array<U> {
+  let result: U[] = [];
+  for (let i = 0; i < length; i++) {
+    result[i] = value;
+  }
+  return result;
+}
+
+creatArr<string>(5, "222");
+
+// 在上例中,我们在函数后面添加了<U>, 其中U是用来指定任意输入的类型,在后面的输入value:U和Array<U>就可以使用了
+
+// 当然也可以不手动指定 可以推算出来
+creatArr(5, "222");
+
+// 多个类型参数
+// 在定义泛型的时候 可以一次定义多个类型参数
+
+function swap<T, U>(arr: [T, U]): [U, T] {
+  return [arr[1], arr[0]];
+}
+
+swap(["seven", 7]);
+
+// 泛型约束
+// 上例中，泛型 T 不一定包含属性 length，所以编译的时候报错了。
+// 这时，我们可以对泛型进行约束，只允许这个函数传入那些包含 length 属性的变量。这就是泛型约束：
+
+function lsg<T>(arg: T) {
+  console.log(arg.length); // Property 'length' does not exist on type 'T'
+  return arg;
+}
+
+interface Lg {
+  length: number;
+}
+
+function ls<T extends Lg>(arg: T) {
+  console.log(arg.length);
+  return arg;
+}
+
+// 上例中我们使用extends 约束了泛型T的类型, 只允许传入包含length的变量,这就是泛型约束
+// 多个类型参数之间 也可以相互约束
+
+function copyId<T extends U, U>(target: T, source: U): T {
+  for (let id in source) {
+    // <T>source 将source断言成T
+    // source as T
+    target[id] = (<T>source)[id];
+  }
+  return target;
+}
+
+// 泛型接口
+
+interface SearchFunc {
+  (source: string, key: string): boolean;
+}
+
+let mySearch: SearchFunc = (a, b) => {
+  return a.indexOf(b) > -1;
+};
+
+// 当然也可以使用含有泛型的接口来定义函数的形状
+
+interface CreateArr {
+  <T>(length: number, value: T): Array<T>;
+}
+
+let create: CreateArr = <T>(lg: number, value: T): Array<T> => {
+  let result: Array<T> = [];
+  for (let i = 0; i < length; i++) {
+    result[i] = value;
+  }
+  return result;
+};
+
+create<string>(10, "sss");
+
+// 也可以把泛型提到接口名字
+
+interface Back<T> {
+  (t: T): T;
+}
+
+let back: Back<string>; // 此时在使用泛型接口的时候，需要定义泛型的类型。
+
+back("222");
+
+// 泛型类
+
+class GenericNumber<T> {
+  t: T;
+  back(x: T, y: T): [T, T] {
+    return [x, y];
+  }
+}
+
+let myNum = new GenericNumber<number>();
+
+// 泛型默认参数类型
+// 从ts 2.3以后,我们可以为泛型中的类型指定默认类型， 当泛型在使用中没有指定并且无法预测时, 这个默认类型会起作用
+
+function join<T = string>(x: number, y: T): T[] {
+  return [y];
+}
+
+/**
+ * 声明合并
+ * 如果定义了两个相同名字的函数,接口或者类 ,那么他们将合并成为一个类型
+ */
+
+// 函数的合并 重载
+
+function rename(string): string;
+function rename(number): number;
+
+function rename(name: string | number): number | string {
+  if (typeof name === "string") {
+    return `${name}`;
+  }
+  return name;
+}
+
+// 接口的合并
+
+interface Alarms {
+  name: string;
+}
+
+interface Alarms {
+  tip: string;
+}
+// Type '{}' is missing the following properties from type 'Alarms': name, tipts(2739)
+let alarm: Alarms = {
+  name: "alarm",
+  tip: "会合并2个同名的接口"
+};
+
+// 合并的属性值的类型必须是唯一的
+
+interface Count {
+  price: number;
+  name: string;
+}
+
+interface Count {
+  price: string; // Subsequent property declarations must have the same type.
+  //  Property 'price' must be of type 'number', but here has type 'string'
+}
+
+// 接口中方法的合并与函数重载的表现一致
+
+interface Query {
+  price: number;
+  alert(a: string): string;
+}
+
+interface Query {
+  weight: string;
+  alert(b: string, a: number): string;
+}
+// Type '{}' is missing the following properties from type 'Query': price, alert, weight
+let query: Query = {
+  price: 20,
+  weight: "20kg",
+  alert(a: string, b?: number) {
+    return `${a}`;
+  }
+};
