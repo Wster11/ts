@@ -12,7 +12,8 @@ let str: string = "hello ts";
 function alertName(): void {
   alert("my name is stwang");
 }
-// 声明void变量没什么用 你只能将它赋值为null 或者 undefined
+// 不同的 tsconfig.json 配置会产生不同的报错等级。这里的代码是基于 tsconfig.json 中配置 strict: false 的
+// 声明void变量没什么用 你只能将它赋值为null 或者 undefined  严格模式下会报错
 let empty: void = undefined;
 let emptyNull: void = null;
 // undefined 和 null 是所有类型的子类型 就是说 undefined 类型的变量，可以赋值给 number 类型的变量：
