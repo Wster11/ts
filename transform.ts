@@ -118,3 +118,56 @@ type AppendArgument<Func extends Function, Arg> = Func extends (
 type getInfo = AppendArgument<getName, string>;
 
 // 索引类型重新构造
+
+type Mapping<Obj extends object> = {
+  // 每个属性都会经过这个构造, 注意是类型
+  [Key in keyof Obj]: [Obj[Key], Obj[Key], Obj[Key]];
+};
+
+type MapRes = Mapping<{
+  a: 1;
+  b: 2;
+}>;
+
+// UppercaseKey
+
+type UppercaseKey<Obj extends object> = {
+  // Key & string, 取Key的类型为string的
+  [Key in keyof Obj as Uppercase<Key & string>]: Obj[Key];
+};
+
+type UpperKeyRes = UppercaseKey<{ name: "sttest"; age: "27" }>;
+
+// TypeScript 提供了内置的高级类型 Record 来创建索引类型：
+type UppercaseKeyWithRecord<Obj extends Record<string, any>> = {
+  [Key in keyof Obj as Uppercase<Key & string>]: Obj[Key];
+};
+
+type UppercaseKeyWithRecordRes = UppercaseKeyWithRecord<{
+  name: "name";
+  age: 20;
+  10: "10";
+}>;
+
+// ToReadonly
+type ToReadonly<Obj> = {
+  readonly [Key in keyof Obj]: Obj[Key];
+};
+
+type ReadOnlyRes = ToReadonly<[1,2,3,4]>
+
+// ToPartial 可选
+
+type ToPartial<Obj> = {
+  [Key in keyof Obj]?: Obj[Key]
+}
+
+type ToPartialRes = ToPartial<{name: 'stwang', age: 19}>
+
+// ToMutable
+
+type ToMutable<T> = {
+  [Key in keyof T]: T[Key]
+}
+
+// type ToMutableRes = ToMutable<>
