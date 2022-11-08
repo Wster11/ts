@@ -132,13 +132,14 @@ type MapRes = Mapping<{
 // UppercaseKey
 
 type UppercaseKey<Obj extends object> = {
+  // 除了可以对Value进行修改，也可以对Key进行修改，使用as, 这叫做重映射
   // Key & string, 取Key的类型为string的
   [Key in keyof Obj as Uppercase<Key & string>]: Obj[Key];
 };
 
 type UpperKeyRes = UppercaseKey<{ name: "sttest"; age: "27" }>;
 
-// TypeScript 提供了内置的高级类型 Record 来创建索引类型：
+// TypeScript 提供了内置的高级类型 Record 来创建索引类型：指定Key为string的进行转换
 type UppercaseKeyWithRecord<Obj extends Record<string, any>> = {
   [Key in keyof Obj as Uppercase<Key & string>]: Obj[Key];
 };
@@ -154,20 +155,59 @@ type ToReadonly<Obj> = {
   readonly [Key in keyof Obj]: Obj[Key];
 };
 
-type ReadOnlyRes = ToReadonly<[1,2,3,4]>
+type ReadOnlyRes = ToReadonly<[1, 2, 3, 4]>;
 
 // ToPartial 可选
 
 type ToPartial<Obj> = {
-  [Key in keyof Obj]?: Obj[Key]
-}
+  [Key in keyof Obj]?: Obj[Key];
+};
 
-type ToPartialRes = ToPartial<{name: 'stwang', age: 19}>
+type ToPartialRes = ToPartial<{ name: "stwang"; age: 19 }>;
 
 // ToMutable
 
 type ToMutable<T> = {
-  [Key in keyof T]: T[Key]
+  -readonly // 移除readOnly属性
+  [Key in keyof T]: T[Key];
+};
+
+type ToMutableRes = ToMutable<{
+  readonly name: string;
+  age: number;
+}>;
+
+type ToRequired<T> = {
+  [Key in keyof T]-?: T[Key];
+};
+
+type ToRequiredRes = ToRequired<{
+  name?: string;
+  age?: number;
+}>;
+
+// 过滤值的类型
+type FilterByValueType<Obj extends Record<string, any>, ValueType> = {
+  [Key in keyof Obj as Obj[Key] extends ValueType ? Key : never]: Obj[Key];
+};
+
+interface Person {
+  name: string;
+  age: number;
+  hobby: string[];
 }
 
-// type ToMutableRes = ToMutable<>
+type FilterResult = FilterByValueType<Person, string | number>;
+
+/**
+ * SUMMARY:
+ * 
+ * TypeScript支持type、infer、类型参数来保存任意类型，相当于变量的作用
+ * 但也其实不能叫做变量，因为他们是不可变的，除非构造出新的类型，并且可以在
+ * 构造类型的过程中，对原类型进行一些过滤和变换。
+ * 
+ * 数组、字符串、函数、索引类型等都可以用这种方式对原类型做变换产生新的类型。
+ * 其中索引类型有专门的语法叫做映射类型，对索引做修改的 as 叫做重映射。
+ * 
+ */
+
