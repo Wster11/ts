@@ -104,3 +104,9 @@ type FibonacciLoop<
 type Fibonacci<Num extends number> = FibonacciLoop<[1], [], [], Num>;
 
 type FibonacciRes = Fibonacci<20>;
+
+/**
+ * SUMMARY:
+ * TYPESCRIPT没有加减乘除操作，但是我们通过数组类型的构造和提取， 然后取长度的方式来实现数值运算。
+ *
+ */
